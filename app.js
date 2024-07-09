@@ -1,3 +1,5 @@
+import 'dotenv/config.js';
+
 import express from 'express';
 import cors from 'cors';
 import multer from 'multer';
@@ -212,6 +214,8 @@ servidor.post('/perfil/capa', uploadPerfil.single('imagem'), (req, resp) => {
 
 
 
+const PORTA = process.env.PORTA;
+
 servidor.listen(
-    5001,
-    () => console.log('---> API subiu com sucesso na porta 5001!'));
+    PORTA,
+    () => console.log(`---> API subiu com sucesso na porta ${PORTA}!`));
