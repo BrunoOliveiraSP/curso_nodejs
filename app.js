@@ -1,12 +1,163 @@
-import express from 'express';
+import express, { urlencoded } from 'express';
 
 const servidor = express();
+servidor.use(express.json());
 
 
 servidor.get('/helloworld', (req, resp) => {
     // código do endpoint
-    resp.send('Hello world!!! =))');
+
+    resp.send({
+        mensagem: 'Hello world!'    
+    });
 })
+
+
+servidor.get('/mensagem/boasvindas', (req, resp) => {
+    resp.send({
+        mensagem: 'Olá, sejam bem-vindos e bem-vindas!'
+    });
+})
+
+
+servidor.get('/v2/mensagem/boasvindas', (req, resp) => {
+    resp.send({
+        mensagem: 'Que bom que você está aqui! s2'
+    });
+})
+
+
+servidor.get('/mensagem/ocupado', (req, resp) => {
+    resp.send({
+        mensagem: 'Estou ocupado no momento.'
+    });
+})
+
+
+servidor.get('/mensagem/ocupado/recado', (req, resp) => {
+    resp.send({
+        mensagem: 'Estou ocupado, deixe uma mensagem no email xxxxx.'
+    });
+})
+
+
+servidor.get('/calculadora/somar/:n1/:n2', (req, resp) => {
+    let n1 = Number(req.params.n1);
+    let n2 = Number(req.params.n2);
+    let soma = n1 + n2;
+
+    resp.send({
+        entradas: {
+            numero1: n1,
+            numero2: n2
+        },
+        soma: soma
+    });
+})
+
+
+servidor.get('/calculadora/somar2', (req, resp) => {
+    let n1 = Number(req.query.num1);
+    let n2 = Number(req.query.num2);
+    let soma = n1 + n2;
+
+    resp.send({
+        soma: soma
+    });
+})
+
+
+servidor.get('/mensagem/ola', (req, resp) => {
+    let pessoa = req.query.nome ?? 'você';
+
+    resp.send({
+        mensagem: 'Olá ' + pessoa
+    });
+})
+
+
+servidor.post('/media', (req, resp) => {
+    let n1 = req.body.nota1;
+    let n2 = req.body.nota2;
+    let n3 = req.body.nota3;
+
+    let media = (n1 + n2 + n3) / 3;
+
+    resp.send({
+        media: media
+    });
+})
+
+
+servidor.post('/dobros', (req, resp) => {
+    let nums = req.body.numeros;
+
+    let nums2 = [];
+    for (let i = 0; i < nums.length; i++) {
+        nums2[i] = nums[i] * 2;
+    }
+
+    resp.send({
+        numeros: nums,
+        dobros: nums2
+    });
+})
+
+
+servidor.post('/loja/pedido', (req, resp) => {
+    let total = req.body.total;
+    let parcelas = req.body.parcelas;
+    let cupom = req.query.cupom;
+
+    if (parcelas > 1) {
+        let juros = total * 0.05;
+        total += juros;
+    }
+
+    if (cupom == 'QUERO100') {
+        total -= 100;
+    }
+
+    let valorParcela = total / parcelas;
+
+    resp.send({
+        total: total,
+        valorParcela: valorParcela
+    });
+})
+
+
+
+servidor.post('/loja/pedido/completo', (req, resp) => {
+    let parcelas = req.body.parcelas;
+    let itens = req.body.itens;
+    let cupom = req.query.cupom;
+
+    let total = 0;
+    for (let produto of itens) {
+        total += produto.preco
+    }
+
+    if (parcelas > 1) {
+        let juros = total * 0.05;
+        total += juros;
+    }
+
+
+    if (cupom == 'QUERO100') {
+        total -= 100;
+    }
+
+    let valorParcela = total / parcelas;
+
+    resp.send({
+        total: total,
+        qtdParcelas: parcelas,
+        valorParcela: valorParcela
+    });
+})
+
+
 
 
 
