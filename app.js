@@ -1,7 +1,18 @@
-import express, { urlencoded } from 'express';
+import express from 'express';
+import cors from 'cors';
+import multer from 'multer';
 
 const servidor = express();
 servidor.use(express.json());
+servidor.use(cors());
+
+
+let uploadPerfil = multer({ dest: './storage/perfil' })
+
+
+servidor.use('/storage/perfil', express.static('./storage/perfil'))
+servidor.use('/storage/album', express.static('./storage/album'))
+
 
 
 servidor.get('/helloworld', (req, resp) => {
@@ -42,6 +53,14 @@ servidor.get('/mensagem/ocupado/recado', (req, resp) => {
 
 
 servidor.get('/calculadora/somar/:n1/:n2', (req, resp) => {
+    if (isNaN(req.params.n1) || isNaN(req.params.n2)) {
+        resp.status(400).send({
+            erro: 'Os parâmetros devem ser números.'
+        })
+        return;
+    }
+
+
     let n1 = Number(req.params.n1);
     let n2 = Number(req.params.n2);
     let soma = n1 + n2;
@@ -53,6 +72,7 @@ servidor.get('/calculadora/somar/:n1/:n2', (req, resp) => {
         },
         soma: soma
     });
+
 })
 
 
@@ -68,6 +88,13 @@ servidor.get('/calculadora/somar2', (req, resp) => {
 
 
 servidor.get('/mensagem/ola', (req, resp) => {
+    if (!req.query.nome) {
+        resp.status(400).send({
+            erro: 'O parâmetro query (nome) é obrigatório.'
+        })
+        return;
+    }
+
     let pessoa = req.query.nome ?? 'você';
 
     resp.send({
@@ -129,34 +156,58 @@ servidor.post('/loja/pedido', (req, resp) => {
 
 
 servidor.post('/loja/pedido/completo', (req, resp) => {
-    let parcelas = req.body.parcelas;
-    let itens = req.body.itens;
-    let cupom = req.query.cupom;
+    try {
+        if (!req.body.parcelas || isNaN(req.body.parcelas)) throw new Error('O parâmetro parcela está inválido.')
+        if (!req.body.itens) throw new Error('O parâmetro itens está inválido.')
+        
 
-    let total = 0;
-    for (let produto of itens) {
-        total += produto.preco
+        let parcelas = req.body.parcelas;
+        let itens = req.body.itens;
+        let cupom = req.query.cupom;
+
+        let total = 0;
+        for (let produto of itens) {
+            total += produto.preco
+        }
+
+        if (parcelas > 1) {
+            let juros = total * 0.05;
+            total += juros;
+        }
+
+
+        if (cupom == 'QUERO100') {
+            total -= 100;
+        }
+
+        let valorParcela = total / parcelas;
+
+        resp.send({
+            total: total,
+            qtdParcelas: parcelas,
+            valorParcela: valorParcela
+        });
+    }
+    catch (err) {
+        resp.status(400).send({
+            erro: err.message
+        })
     }
 
-    if (parcelas > 1) {
-        let juros = total * 0.05;
-        total += juros;
-    }
-
-
-    if (cupom == 'QUERO100') {
-        total -= 100;
-    }
-
-    let valorParcela = total / parcelas;
-
-    resp.send({
-        total: total,
-        qtdParcelas: parcelas,
-        valorParcela: valorParcela
-    });
 })
 
+
+servidor.post('/perfil/capa', uploadPerfil.single('imagem'), (req, resp) => {
+    let caminho = req.file.path;
+    let extensao = req.file.mimetype;
+    let nome = req.file.originalname;
+
+    resp.send({
+        caminho: caminho,
+        extensao: extensao,
+        nome: nome
+    })
+})
 
 
 
