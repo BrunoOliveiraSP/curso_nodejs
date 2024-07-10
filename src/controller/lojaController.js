@@ -1,8 +1,14 @@
+import { logError } from "../utils/log.js";
+import { criarErro } from "../utils/error.js";
+
 import { calcularTotal, calcularValorParcela } from "../service/loja/pedidoCompletoService.js";
 import { validarPedidoCompleto } from "../validation/loja/pedidoCompletoValidation.js";
 
+
 import { Router } from "express";
 const endpoints = Router();
+
+
 
 endpoints.post('/loja/pedido', (req, resp) => {
     let total = req.body.total;
@@ -46,9 +52,8 @@ endpoints.post('/loja/pedido/completo', (req, resp) => {
         });
     }
     catch (err) {
-        resp.status(400).send({
-            erro: err.message
-        })
+        logError(err);
+        resp.status(400).send(criarErro(err))
     }
 
 })
