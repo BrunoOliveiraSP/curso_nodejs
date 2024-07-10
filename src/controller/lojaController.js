@@ -1,9 +1,5 @@
-import { logError } from "../utils/log.js";
-import { criarErro } from "../utils/error.js";
-
 import { calcularTotal, calcularValorParcela } from "../service/loja/pedidoCompletoService.js";
 import { validarPedidoCompleto } from "../validation/loja/pedidoCompletoValidation.js";
-
 
 import { Router } from "express";
 const endpoints = Router();

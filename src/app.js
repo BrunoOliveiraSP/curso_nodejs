@@ -2,6 +2,9 @@ import 'dotenv/config.js';
 import express from 'express';
 import cors from 'cors';
 
+// importa as funções globais
+import './utils/global.js';
+
 import adicionarRotas from './rotas.js';
 
 const servidor = express();
