@@ -1,4 +1,5 @@
 import { calcularTotal, calcularValorParcela } from "../service/loja/pedidoCompletoService.js";
+import { validarPedidoCompleto } from "../validation/loja/pedidoCompletoValidation.js";
 
 import { Router } from "express";
 const endpoints = Router();
@@ -29,8 +30,7 @@ endpoints.post('/loja/pedido', (req, resp) => {
 
 endpoints.post('/loja/pedido/completo', (req, resp) => {
     try {
-        if (!req.body.parcelas || isNaN(req.body.parcelas)) throw new Error('O parâmetro parcela está inválido.')
-        if (!req.body.itens) throw new Error('O parâmetro itens está inválido.')
+        validarPedidoCompleto(req);
         
         let parcelas = req.body.parcelas;
         let itens = req.body.itens;
